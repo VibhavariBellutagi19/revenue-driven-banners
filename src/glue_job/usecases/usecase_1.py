@@ -2,7 +2,7 @@ from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 from pyspark.sql import DataFrame, SparkSession
 
-from ..usecases.base import UseCase, ActionDataFrames
+from ..usecases.abstract_usecase import UseCase, ActionDataFrames
 
 NUM_OF_BANNERS = 10
 
@@ -11,9 +11,6 @@ class UseCase1(UseCase):
     """
     UseCase1 - x >= 10 - Show the Top 10 banners based on revenue within that campaign
     """
-
-    def __init__(self, campaign_id: int):
-        self.campaign_id = campaign_id
 
     def compute_use_case(self, spark: SparkSession, dataframes: ActionDataFrames) -> DataFrame:
         """
@@ -36,7 +33,6 @@ class UseCase1(UseCase):
         with_rank_df = joined_df.withColumn("rnk", F.dense_rank().over(window_spec))
 
         # Filtering based on campaign_id and rank
-        result_df = with_rank_df.filter((with_rank_df.campaign_id == self.campaign_id)
-                                        & (with_rank_df.rnk <= NUM_OF_BANNERS)).\
+        result_df = with_rank_df.filter((with_rank_df.rnk <= NUM_OF_BANNERS)).\
             select("banner_id", "campaign_id").distinct()
         return result_df

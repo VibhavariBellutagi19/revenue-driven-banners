@@ -1,12 +1,12 @@
 import unittest
 
-import pytest
 from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, IntegerType, StructField, FloatType
 
-from glue_job.usecases.base import ActionDataFrames
+from glue_job.usecases.abstract_usecase import ActionDataFrames
 from glue_job.usecases.usecase_3 import UseCase3
-from src.glue_job.usecases.usecase_2 import UseCase2
 from src.glue_job.usecases.usecase_1 import UseCase1
+from src.glue_job.usecases.usecase_2 import UseCase2
 from test_glue_job import TEST_ROOT
 
 
@@ -15,20 +15,32 @@ class TestComputeUseCases(unittest.TestCase):
     Class for testing compute_use_cases
     """
 
-    def get_dataframe(self, path):
-        return self.spark. \
-            read. \
-            format("csv"). \
-            option("inferSchema", True). \
-            option("header", True).load(path)
+    def get_dataframe(self, path, schema):
+        return self.spark \
+            .read \
+            .format("csv") \
+            .schema(schema) \
+            .option("header", True).load(path)
 
     def setUp(self):
         self.spark = SparkSession.builder.master("local[2]") \
             .appName("test application") \
             .config("spark.ui.enabled", "false") \
             .getOrCreate()
-        self.clicks_df = self.get_dataframe(f"{TEST_ROOT}/resources/test_clicks.csv")
-        self.conversions_df = self.get_dataframe(f"{TEST_ROOT}/resources/test_conversions.csv")
+
+        clicks_schema = StructType([
+            StructField("click_id", IntegerType(), True),
+            StructField("banner_id", IntegerType(), True),
+            StructField("campaign_id", IntegerType(), True)
+        ])
+
+        conversions_schema = StructType([
+            StructField("conversion_id", IntegerType(), True),
+            StructField("click_id", IntegerType(), True),
+            StructField("revenue", FloatType(), True),
+        ])
+        self.clicks_df = self.get_dataframe(f"{TEST_ROOT}/resources/test_clicks.csv", clicks_schema)
+        self.conversions_df = self.get_dataframe(f"{TEST_ROOT}/resources/test_conversions.csv", conversions_schema)
 
     def tearDown(self) -> None:
         self.spark.stop()
@@ -39,12 +51,11 @@ class TestComputeUseCases(unittest.TestCase):
         Show the Top 10 banners based on revenue within that campaign
         :return:
         """
-        campaign_id = 1
         test_action_dataframes = ActionDataFrames(
             clicks_df=self.clicks_df,
             conversions_df=self.conversions_df
         )
-        test_usecase_1 = UseCase1(campaign_id)
+        test_usecase_1 = UseCase1()
         result = test_usecase_1.compute_use_case(self.spark, test_action_dataframes)
         expected_len = 10
 
@@ -69,22 +80,38 @@ class TestComputeUseCases(unittest.TestCase):
 
         assert result.count() == expected_len
 
-    def test_compute_use_case_3(self):
+    def test_compute_use_case_3_when_num_of_banners_is_5(self, expected_len=None):
         """
-        test when the use_case 3 - x in range of 1-5 - Show the top 5 banners based on clicks.
-        If the number of banners with clicks is less than 5 within that campaign,
-        then you should add random banners to make up a collection of 5 unique banners.
+        test when the use_case 3 - x - tests when num of banner is 5
         :return:
         """
         campaign_id = 3
 
         test_action_dataframes = ActionDataFrames(
-            clicks_df=self.clicks_df,
-            conversions_df=self.conversions_df
+            clicks_df=self.clicks_df
         )
         test_usecase_3 = UseCase3(campaign_id)
         result = test_usecase_3.compute_use_case(self.spark, test_action_dataframes)
-        expected_len = 6
+        columns = ["banner_id", "campaign_id"]
+        expected_len = 5
 
+        assert list(result.columns) == columns
         assert result.count() == expected_len
 
+    def test_compute_use_case_3_when_num_of_banners_is_less_than_5(self, expected_len=None):
+        """
+        test the use_case 3 - when num of banner is < 5
+        :return:
+        """
+        campaign_id = 4
+
+        test_action_dataframes = ActionDataFrames(
+            clicks_df=self.clicks_df
+        )
+        test_usecase_3 = UseCase3(campaign_id)
+        result = test_usecase_3.compute_use_case(self.spark, test_action_dataframes)
+        columns = ["banner_id", "campaign_id"]
+        expected_len = 4
+
+        assert list(result.columns) == columns
+        assert result.count() == expected_len
