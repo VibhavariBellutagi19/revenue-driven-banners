@@ -1,0 +1,8 @@
+account_id: 212435474521
+bucket_name: "tha-vibhavari-bellutagi-2023"
+
+# source file path
+trigger_lambda_path: "trigger.py"
+push_to_dynamodb_path: "push_to_dynamodb.py"
+serve_requests_path: "serve_requests.py"
+glue_main_path: "main.py"
