@@ -3,7 +3,6 @@ import unittest
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, IntegerType, StructField, FloatType
 
-from glue_job.usecases.abstract_usecase import ActionDataFrames
 from glue_job.usecases.usecase_3 import UseCase3
 from src.glue_job.usecases.usecase_1 import UseCase1
 from src.glue_job.usecases.usecase_2 import UseCase2
@@ -42,6 +41,9 @@ class TestComputeUseCases(unittest.TestCase):
         self.clicks_df = self.get_dataframe(f"{TEST_ROOT}/resources/test_clicks.csv", clicks_schema)
         self.conversions_df = self.get_dataframe(f"{TEST_ROOT}/resources/test_conversions.csv", conversions_schema)
 
+        self.clicks_df.createOrReplaceTempView("clicks")
+        self.conversions_df.createOrReplaceTempView("conversions")
+
     def tearDown(self) -> None:
         self.spark.stop()
 
@@ -51,12 +53,8 @@ class TestComputeUseCases(unittest.TestCase):
         Show the Top 10 banners based on revenue within that campaign
         :return:
         """
-        test_action_dataframes = ActionDataFrames(
-            clicks_df=self.clicks_df,
-            conversions_df=self.conversions_df
-        )
         test_usecase_1 = UseCase1()
-        result = test_usecase_1.compute_use_case(self.spark, test_action_dataframes)
+        result = test_usecase_1.compute_use_case(self.spark)
         expected_len = 10
 
         assert result.count() == expected_len
@@ -67,15 +65,10 @@ class TestComputeUseCases(unittest.TestCase):
         Show the Top x banners based on revenue within that campaign
         :return:
         """
-        campaign_id = 2
         number_of_banners = 6
 
-        test_action_dataframes = ActionDataFrames(
-            clicks_df=self.clicks_df,
-            conversions_df=self.conversions_df
-        )
-        test_usecase_2 = UseCase2(campaign_id, number_of_banners)
-        result = test_usecase_2.compute_use_case(self.spark, test_action_dataframes)
+        test_usecase_2 = UseCase2(number_of_banners)
+        result = test_usecase_2.compute_use_case(self.spark)
         expected_len = 6
 
         assert result.count() == expected_len
@@ -86,12 +79,10 @@ class TestComputeUseCases(unittest.TestCase):
         :return:
         """
         campaign_id = 3
+        num_of_banners = 1
 
-        test_action_dataframes = ActionDataFrames(
-            clicks_df=self.clicks_df
-        )
-        test_usecase_3 = UseCase3(campaign_id)
-        result = test_usecase_3.compute_use_case(self.spark, test_action_dataframes)
+        test_usecase_3 = UseCase3(num_of_banners)
+        result = test_usecase_3.compute_use_case(self.spark)
         columns = ["banner_id", "campaign_id"]
         expected_len = 5
 
@@ -104,12 +95,10 @@ class TestComputeUseCases(unittest.TestCase):
         :return:
         """
         campaign_id = 4
+        num_of_banners = 1
 
-        test_action_dataframes = ActionDataFrames(
-            clicks_df=self.clicks_df
-        )
-        test_usecase_3 = UseCase3(campaign_id)
-        result = test_usecase_3.compute_use_case(self.spark, test_action_dataframes)
+        test_usecase_3 = UseCase3(num_of_banners)
+        result = test_usecase_3.compute_use_case(self.spark)
         columns = ["banner_id", "campaign_id"]
         expected_len = 4
 
