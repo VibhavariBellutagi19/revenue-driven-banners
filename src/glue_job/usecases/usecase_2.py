@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame, SparkSession
 
 from common import read_utils
-from abstract_usecase import UseCase
+from .abstract_usecase import UseCase
 from log.custom_logger import CustomLog
 
 QUERY_FILE = "usecase_2_query.sql"

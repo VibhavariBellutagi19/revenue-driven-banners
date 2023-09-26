@@ -1,10 +1,10 @@
 from pyspark.sql import DataFrame, SparkSession
 
 from common import read_utils
-from abstract_usecase import UseCase
-from custom_logger import CustomLog
+from .abstract_usecase import UseCase
+from log.custom_logger import CustomLog
 
-QUERY_FILE_PATH = f"resources/usecase_4_query.sql"
+QUERY_FILE_PATH = f"usecase_4_query.sql"
 
 
 class UseCase4(UseCase, CustomLog):

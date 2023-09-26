@@ -1,6 +1,6 @@
 from common import read_utils
 from pyspark.sql import DataFrame, SparkSession
-from abstract_usecase import UseCase
+from .abstract_usecase import UseCase
 from log.custom_logger import CustomLog
 
 NUM_OF_BANNERS = 10

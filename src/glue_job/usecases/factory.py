@@ -1,7 +1,7 @@
-from usecase_1 import UseCase1
-from usecase_2 import UseCase2
-from usecase_3 import UseCase3
-from usecase_4 import UseCase4
+from .usecase_1 import UseCase1
+from .usecase_2 import UseCase2
+from .usecase_3 import UseCase3
+from .usecase_4 import UseCase4
 
 
 class UseCaseFactory:
