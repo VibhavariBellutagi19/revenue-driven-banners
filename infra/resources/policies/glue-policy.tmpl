@@ -1,0 +1,60 @@
+{
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Sid":"ManageGlue",
+         "Effect":"Allow",
+         "Action":[
+            "glue:GetDatabase",
+            "glue:CreateTable",
+            "glue:GetDatabases",
+            "glue:GetTables",
+            "glue:GetTable",
+            "glue:CreateDatabase",
+            "glue:BatchCreatePartition",
+            "glue:UpdateTable",
+            "glue:DeleteDatabase",
+            "glue:DeleteTable",
+            "glue:DeletePartition",
+            "glue:GetConnection"
+         ],
+         "Resource":["*"]
+      },
+      {
+         "Sid":"AllowS3ReadOnAllBuckets",
+         "Effect":"Allow",
+         "Action":[
+            "s3:Get*",
+            "s3:List*"
+         ],
+         "Resource":["arn:aws:s3:::${s3_bucket}",
+                     "arn:aws:s3:::${s3_bucket}/*"]
+      },
+      {
+         "Sid": "AllowVPCGlueAccess",
+         "Effect": "Allow",
+         "Action": [
+             "ec2:DescribeVpcEndpoints",
+             "ec2:DescribeRouteTables",
+             "ec2:CreateNetworkInterface",
+             "ec2:DeleteNetworkInterface",
+             "ec2:DescribeNetworkInterfaces",
+             "ec2:CreateTags",
+             "ec2:DescribeSecurityGroups",
+             "ec2:DescribeSubnets",
+             "ec2:DescribeVpcAttribute"
+         ],
+         "Resource": "*"
+     },
+      {
+      		 "Action": [
+      		       "logs:CreateLogGroup",
+                   "logs:CreateLogStream",
+                   "logs:PutLogEvents"
+                    ],
+             "Effect": "Allow",
+      	     "Resource": "*",
+      	     "Sid": "AllowCloudWatchLogs"
+      		}
+   ]
+}

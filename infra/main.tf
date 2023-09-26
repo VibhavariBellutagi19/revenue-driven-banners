@@ -1,5 +1,12 @@
 provider "aws" {
-  region = "eu-west-1"
+  region = var.region
+  default_tags {
+    tags = {
+      environment = "dev"
+      owner       = local.vars.owner
+      project     = "tha-vibhavari-bellutagi-assignment"
+    }
+  }
 }
 
 terraform {

@@ -1,8 +1,19 @@
 account_id: 212435474521
-bucket_name: "tha-vibhavari-bellutagi-2023"
+bucket_name: "revenue-driven-banner-2023"
+
+# tags
+owner: vibhavari.bellutagi@gmail.com
 
 # source file path
-trigger_lambda_path: "trigger.py"
-push_to_dynamodb_path: "push_to_dynamodb.py"
-serve_requests_path: "serve_requests.py"
-glue_main_path: "main.py"
+trigger_lambda: "trigger.py"
+push_to_dynamodb: "push_to_dynamodb.py"
+serve_requests: "serve_requests.py"
+glue_main: "main.py"
+glue_common: "common_package"
+
+# network configs
+security_group: "sg-0e4e067a706d31b87"
+vpc_id: "vpc-02d655c50735a826d"
+subnet_id: "subnet-0cea3f4b937d6cb02"
+availability_zone_id: eu-west-1b
+route_table_id: "rtb-06867db7c593afd2a"
