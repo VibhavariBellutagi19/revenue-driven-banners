@@ -1,15 +1,15 @@
 from pyspark.sql import DataFrame, SparkSession
 
-from .. import GLUE_ROOT
-from ..common import read_utils
-from ..usecases.abstract_usecase import UseCase
+from common import read_utils
+from abstract_usecase import UseCase
+from log.custom_logger import CustomLog
 
 TOP_X = 5
 
-QUERY_FILE_PATH = f"{GLUE_ROOT}/resources/usecase_3_query.sql"
+QUERY_FILE = "usecase_3_query.sql"
 
 
-class UseCase3(UseCase):
+class UseCase3(UseCase, CustomLog):
     """
     class for Usecase - 3
     """
@@ -24,7 +24,8 @@ class UseCase3(UseCase):
         :return: top 10 banner id on revenue within the campaign id
         """
         additional_banners = TOP_X - self.number_of_banners
-        query = read_utils.read_sql_query_from_file(QUERY_FILE_PATH.format(self.number_of_banners, additional_banners))
+        query = read_utils.read_sql_query_from_file(QUERY_FILE).format(self.number_of_banners, additional_banners)
+        self.log_info(f"Executing usecase_3 query - {self.query}")
 
         result_df = spark.sql(query)
         return result_df
