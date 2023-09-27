@@ -1,0 +1,42 @@
+{
+  "StartAt": "Trigger Glue Job",
+  "States": {
+    "Trigger Glue Job": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "${glue_job_name}",
+        "Arguments": {
+          "--dataset_id.$": "$.dataset_id"
+        }
+      },
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Error Handler"
+        }
+      ],
+      "Next": "Invoke Lambda Function"
+    },
+    "Invoke Lambda Function": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:${region}:${account_id}:function:${lambda_func}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Error Handler"
+        }
+      ],
+      "End": true
+    },
+    "Error Handler": {
+      "Type": "Fail",
+      "Error": "Error",
+      "Cause": "An error occurred while executing the state machine."
+    }
+  }
+}

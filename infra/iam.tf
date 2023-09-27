@@ -11,6 +11,36 @@ resource "aws_iam_policy" "glue_policy" {
   })
 }
 
+resource "aws_iam_role" "sfn_role" {
+  name = "sfn-role"
+  assume_role_policy = templatefile("${path.module}/resources/policies/sfn-role.tmpl", {})
+}
+
+
+resource "aws_iam_role_policy" "sfn_policy" {
+  name = "lambda-policy"
+  role = aws_iam_role.sfn_role.id
+
+
+  policy = templatefile("${path.module}/resources/policies/sfn-policy.tmpl", {})
+}
+
+resource "aws_iam_role" "lambda_role" {
+  name = "lambda-role"
+
+  assume_role_policy = templatefile("${path.module}/resources/policies/lambda-role.tmpl", {})
+}
+
+resource "aws_iam_role_policy" "lambda_policy" {
+  name = "lambda-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = templatefile("${path.module}/resources/policies/lambda-policy.tmpl", {
+    s3_bucket = aws_s3_bucket.s3_bucket.id
+  })
+}
+
+
 resource "aws_iam_role_policy_attachment" "glue_policy_attachment" {
   role      = aws_iam_role.glue_job_role.name
   policy_arn = aws_iam_policy.glue_policy.arn

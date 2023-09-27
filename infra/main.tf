@@ -20,5 +20,4 @@ terraform {
 
 locals {
   vars    = yamldecode(file("./input_vars.yaml"))
-  account_id     = local.vars["account_id"]
 }
